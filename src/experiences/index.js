@@ -14,7 +14,9 @@ experiencesRouter.post("/:userId/experiences", async (req, res, next) => {
         createHttpError(404, `User with id ${req.params.userId} not found!`)
       );
     }
-    const { experienceId } = await ExperiencesModel.create(req.body);
+    const experienceToCreate = { ...req.body, userId: req.params.userId };
+
+    const { experienceId } = await ExperiencesModel.create(experienceToCreate);
     res.status(201).send({ experienceId });
   } catch (error) {
     next(error);

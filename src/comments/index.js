@@ -14,7 +14,9 @@ commentsRouter.post("/:postId/comments", async (req, res, next) => {
         createHttpError(404, `Post with id ${req.params.postId} not found!`)
       );
     }
-    const { commentId } = await CommentsModel.create(req.body);
+    const commentToAdd = { ...req.body, postId: req.params.postId };
+
+    const { commentId } = await CommentsModel.create(commentToAdd);
     res.status(201).send({ commentId });
   } catch (error) {
     next(error);

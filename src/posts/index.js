@@ -21,10 +21,6 @@ postsRouter.post("/", async (req, res, next) => {
 
 postsRouter.get("/", async (req, res, next) => {
   try {
-    const user = await UsersModel.findByPk(req.body.userId);
-    if (!user) {
-      next(createHttpError(404, `User with id ${req.body.userId} not found!`));
-    }
     const posts = await PostsModel.findAll();
     res.send(posts);
   } catch (error) {
@@ -34,10 +30,6 @@ postsRouter.get("/", async (req, res, next) => {
 
 postsRouter.get("/:postId", async (req, res, next) => {
   try {
-    const user = await UsersModel.findByPk(req.body.userId);
-    if (!user) {
-      next(createHttpError(404, `User with id ${req.body.userId} not found!`));
-    }
     const post = await PostsModel.findByPk(req.params.postId, {
       attributes: { exclude: ["createdAt", "updatedAt"] },
     });
@@ -55,10 +47,6 @@ postsRouter.get("/:postId", async (req, res, next) => {
 
 postsRouter.put("/:postId", async (req, res, next) => {
   try {
-    const user = await UsersModel.findByPk(req.body.userId);
-    if (!user) {
-      next(createHttpError(404, `User with id ${req.body.userId} not found!`));
-    }
     const [numberOfUpdatedRows, updatedRecords] = await PostsModel.update(
       req.body,
       {
@@ -79,10 +67,6 @@ postsRouter.put("/:postId", async (req, res, next) => {
 });
 
 postsRouter.delete("/:postId", async (req, res, next) => {
-  const user = await UsersModel.findByPk(req.body.userId);
-  if (!user) {
-    next(createHttpError(404, `User with id ${req.body.userId} not found!`));
-  }
   try {
     const numberOfDeletedRows = await PostsModel.destroy({
       where: { postId: req.params.postId },
