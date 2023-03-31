@@ -28,12 +28,18 @@ postsRouter.get("/", async (req, res, next) => {
       offset: req.query.offset,
       attributes: { exclude: ["userId"] },
       include: [
-        { model: UsersModel, attributes: ["userId", "name", "surname"] },
+        {
+          model: UsersModel,
+          attributes: ["userId", "name", "surname", "image"],
+        },
         {
           model: CommentsModel,
           attributes: ["comment"],
           include: [
-            { model: UsersModel, attributes: ["userId", "name", "surname"] },
+            {
+              model: UsersModel,
+              attributes: ["userId", "name", "surname", "image"],
+            },
           ],
         },
       ],
