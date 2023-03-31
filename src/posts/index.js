@@ -1,6 +1,7 @@
 import Express from "express";
 import createHttpError from "http-errors";
 import { Op } from "sequelize";
+import CommentsModel from "../comments/model.js";
 import UsersModel from "../users/model.js";
 import PostsModel from "./model.js";
 
@@ -21,8 +22,73 @@ postsRouter.post("/", async (req, res, next) => {
 
 postsRouter.get("/", async (req, res, next) => {
   try {
-    const posts = await PostsModel.findAll();
-    res.send(posts);
+    const { count, rows } = await PostsModel.findAndCountAll({
+      where: { ...res.searchQuery },
+      limit: req.query.limit,
+      offset: req.query.offset,
+      attributes: { exclude: ["userId"] },
+      include: [
+        { model: UsersModel, attributes: ["userId", "name", "surname"] },
+        {
+          model: CommentsModel,
+          attributes: ["comment"],
+          include: [
+            { model: UsersModel, attributes: ["userId", "name", "surname"] },
+          ],
+        },
+      ],
+      order: [
+        [
+          req.query.orderby ? req.query.orderby : "createdAt",
+          req.query.direction ? req.query.direction.toUpperCase() : "ASC",
+        ],
+      ],
+    });
+
+    let response = {
+      numberOfPosts: count,
+      posts: rows,
+    };
+
+    const fullUrl = req.protocol + "://" + req.get("host") + req.originalUrl;
+    if (req.query.limit) {
+      const links = {};
+      if (req.query.offset) {
+        if (parseInt(req.query.offset) !== 0) {
+          if (parseInt(req.query.offset) - parseInt(req.query.limit) < 0) {
+            links.prev = fullUrl.replace(
+              `offset=${req.query.offset}`,
+              "offset=0"
+            );
+          } else {
+            links.prev = fullUrl.replace(
+              `offset=${req.query.offset}`,
+              `offset=${parseInt(req.query.offset) - parseInt(req.query.limit)}`
+            );
+          }
+        }
+        links.next = fullUrl.replace(
+          `offset=${req.query.offset}`,
+          `offset=${parseInt(req.query.offset) + parseInt(req.query.limit)}`
+        );
+      } else {
+        links.next = `${fullUrl}&offset=${parseInt(req.query.limit)}`;
+      }
+      response = {
+        numberOfPages: Math.ceil(count / req.query.limit),
+        links,
+        ...response,
+      };
+    } else if (req.query.offset) {
+      response = {
+        links: {
+          prev: fullUrl.replace(`offset=${req.query.offset}`, "offset=0"),
+        },
+        ...response,
+      };
+    }
+
+    res.send(response);
   } catch (error) {
     next(error);
   }
