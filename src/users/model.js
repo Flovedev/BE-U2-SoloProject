@@ -1,4 +1,5 @@
 import { DataTypes } from "sequelize";
+import CommentsModel from "../comments/model.js";
 import sequelize from "../db.js";
 import ExperiencesModel from "../experiences/model.js";
 import PostsModel from "../posts/model.js";
@@ -50,6 +51,13 @@ UsersModel.hasMany(PostsModel, {
   foreignKey: { name: "userId", allowNull: false },
 });
 PostsModel.belongsTo(UsersModel, {
+  foreignKey: { name: "userId", allowNull: false },
+});
+
+UsersModel.hasMany(CommentsModel, {
+  foreignKey: { name: "userId", allowNull: false },
+});
+CommentsModel.belongsTo(UsersModel, {
   foreignKey: { name: "userId", allowNull: false },
 });
 
