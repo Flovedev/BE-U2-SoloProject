@@ -7,6 +7,7 @@ import {
   genericErrorHandler,
   notFoundErrorHandler,
 } from "./errorHandlers.js";
+import usersRouter from "./users/index.js";
 
 const server = Express();
 const port = process.env.PORT || 3001;
@@ -14,7 +15,7 @@ const port = process.env.PORT || 3001;
 server.use(cors());
 server.use(Express.json());
 
-// server.use("/users", )
+server.use("/users", usersRouter);
 
 server.use(badRequestErrorHandler);
 server.use(notFoundErrorHandler);
