@@ -16,19 +16,7 @@ usersRouter.post("/", async (req, res, next) => {
 
 usersRouter.get("/", async (req, res, next) => {
   try {
-    const query = {};
-    if (req.query.minAge && req.query.maxAge)
-      query.age = { [Op.between]: [req.query.minAge, req.query.maxAge] };
-    if (req.query.firstName)
-      query.firstName = { [Op.iLike]: `%${req.query.firstName}%` };
-    const users = await UsersModel.findAndCountAll({
-      where: { ...query },
-      order: [
-        ["firstName", "ASC"],
-        ["lastName", "ASC"],
-      ],
-    });
-
+    const users = await UsersModel.findAll();
     res.send(users);
   } catch (error) {
     next(error);

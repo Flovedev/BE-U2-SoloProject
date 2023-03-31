@@ -1,5 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../db.js";
+import ExperiencesModel from "../experiences/model.js";
+import PostsModel from "../posts/model.js";
 
 const UsersModel = sequelize.define("user", {
   userId: {
@@ -7,22 +9,48 @@ const UsersModel = sequelize.define("user", {
     primaryKey: true,
     defaultValue: DataTypes.UUIDV4,
   },
-  firstName: {
+  name: {
     type: DataTypes.STRING(50),
     allowNull: false,
   },
-  lastName: {
+  surname: {
     type: DataTypes.STRING(50),
     allowNull: false,
   },
-  age: {
-    type: DataTypes.INTEGER,
+  email: {
+    type: DataTypes.STRING(100),
     allowNull: false,
   },
-  country: {
-    type: DataTypes.STRING(20),
+  bio: {
+    type: DataTypes.TEXT,
     allowNull: false,
   },
+  area: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+  image: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+  cover: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+});
+
+UsersModel.hasMany(ExperiencesModel, {
+  foreignKey: { name: "userId", allowNull: false },
+});
+ExperiencesModel.belongsTo(UsersModel, {
+  foreignKey: { name: "userId", allowNull: false },
+});
+
+UsersModel.hasMany(PostsModel, {
+  foreignKey: { name: "userId", allowNull: false },
+});
+PostsModel.belongsTo(UsersModel, {
+  foreignKey: { name: "userId", allowNull: false },
 });
 
 export default UsersModel;
